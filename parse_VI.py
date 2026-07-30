@@ -58,6 +58,29 @@ PAGE_ROW_OVERRIDES = {
         ["516.", "Philotheca myoporoides\n(Wax flower)", "Plants/cuttings for\npropagation",
          "USA", "Nil", "(i) Post-entry quarantine for a\nperiod of 6 months.\n(ii) Free from soil."],
     ],
+    277: [
+        [None, None, None, "(iii) USA", "Free from quarantine weed seeds.", "Nil"],
+        [None, None, "(ii) Tissue cultured\nplants", "Germany",
+         "Certified that the tissue cultured plants obtained from\nmother stock tested and maintained free from virus.",
+         "Nil"],
+        ["612.", "Sisymbrium irio", "Seeds for Medicinal\npurpose", "China",
+         "Free from quarantine weed seeds\nand other plant debris.", "Nil"],
+        ["613.", "Small fruit plant species:", None, None, None, None],
+        [None, "(a) Blue berry and Cranberry\n(Vaccinium spp.)",
+         "(i) Cuttings\nRooted/\nunrooted/\nGrafts / Bud\nwood/ Saplings\nfor planting",
+         "Any Country",
+         "Free from:\n(a) Leaf rust (Pucciniastrum myrtili)\n(b) Red leaf (Exobasidium vaccinii)\n(c) Red gall (Synchytrium vaccinii)\n(d) Witches‟broom (Pucciniastrum goeppertianum)\n(e) Straw berry weevils (Anthonomus signatus and\nA. bisignifer)\n(f) Blue berry viruses viz., blue berry mosaic, shoe-\nstring, red (necrotic) ring spot, leaf mottle, peach\nrosette and tomato ring spot\n(g) Phytoplasmas (blueberry stunt, witches‟broom\nand cranberry false blossom",
+         "(i) Import subject to prior\napproval of Department of\nAgriculture, Cooperation and\nFarmers Welfare in the\nMinistry of Agriculture\n(Omitted vide Gazette\nNotification S.O. 2221(E) dated\n07th June, 2024)\n(ii) Post-entry quarantine for a\nperiod of 9-12 months;\n(iii) Free from soil\n(iv)Dormant cuttings shall be\nAppropriately treated or\nfumigated at the country of\norigin prior to shipment and\nthe treatment shall be\nendorsed on Phytosanitary\nCertificate."],
+        [None, None, "(ii) Seeds for\nsowing", "Any Country",
+         "Free from:\n(a) Mummy berry (Monilia vacciniicorymbasi)\n(b) Viruses affecting blueberry and cranberry as per\nitem (f) above.",
+         "As per conditions (i) and (ii)\nstated above."],
+        [None, None, "(iii) Tissue cultured\nplants", "Any Country",
+         "Certified that the tissue-cultured plants are obtained\nfrom mother stock tested/indexed and maintained\nvirus-free.",
+         "As per condition (i) stated above."],
+        [None, None, "(iv) Fresh fruit for\nconsumption", "(i) Canada",
+         "Free from:-\n(i) Grapholita packardi ( Cherry fruitworm)\n(ii) Rhagoletis mendax ( Blueberry fruit fly)\n(iii) Spodoptera frugiperda (Fall armyworm)\n(iv) Diaporthe vaccinii (Phomopsis twig blight of\nblueberry)\n(v) Peach rosettemosaic virus (rosette mosaic of\npeach)\n(vi) Tomato ringspot virus (ringspot of tomato)",
+         "Pest free status for Rhagoletis\nmendax (Blueberry fruit fly) as\nper international standards Or\n(a) Methyl bromide fumigation\n@ 32 g/m3 for 2 hrs at 210C\nor above at NAP or\nequivalent thereof against\nBlueberry fruit fly. Or\n(b) Pre-shipment cold treatment\nat 00C or below for 10 days;\n0.550C or below for 11 days;\n1.10C or below for 12 days\nplus in-transit refrigeration"],
+    ],
 }
 
 
@@ -226,13 +249,26 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                         # country-cell remnant that starts lowercase (mid-sentence/mid-parenthetical,
                         # e.g. "dated 29th August, 2019)" finishing "Chile (S.O. 3141 (E)" from the
                         # row above) rather than a genuine new country name.
+                        # A row with country=None is always this kind of split artifact regardless
+                        # of material (confirmed: every occurrence found -- e.g. species 613's
+                        # Raspberry material "(i) Cuttings Rooted/un-" / "rooted)/ Bud wood..." is
+                        # one material description split mid-word across two table rows). A
+                        # lowercase-starting country fragment is the same phenomenon but only when
+                        # material is also blank, since a genuinely new material row always pairs
+                        # with a genuinely new (capitalized) country.
                         is_continuation_fragment = country_entry is None or (
-                            country_entry and country_entry[0].islower()
+                            not material_clean and country_entry and country_entry[0].islower()
                         )
-                        if is_continuation_fragment and sl_no_clean == "" and not material_clean and rows:
+                        if is_continuation_fragment and sl_no_clean == "" and rows:
                             prev = rows[-1]
                             if country_entry:
                                 prev["country"] = ((prev["country"] or "") + " " + country_entry).strip()
+                            if material_clean and material_final and not (prev["material"] or "").endswith(material_final):
+                                prev["material"] = ((prev["material"] or "") + " " + material_final).strip()
+                                # cur_material got set to just this fragment above (before we knew
+                                # it was a split artifact) -- restore it to the full merged text so
+                                # any later row still under the same material carries it correctly.
+                                cur_material = prev["material"]
                             for field, val in (("declarations", decl_final), ("conditions", cond_final)):
                                 if val:
                                     prev[field] = ((prev[field] or "") + " " + val).strip()

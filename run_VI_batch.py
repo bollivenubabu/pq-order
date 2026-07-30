@@ -54,6 +54,26 @@ def main():
     new_rows = parse_pages(start_page, end_page, idx_start=0, carry_forward=carry_forward)
     flag_needs_review(new_rows)
 
+    # A row with country=None and no sl_no is always a split-cell continuation of the
+    # immediately preceding row (verified: every such occurrence found across the whole
+    # dataset is this pattern, e.g. a material description split mid-word across a spurious
+    # extra table row). Within a single batch this merges automatically; at a batch boundary
+    # the "immediately preceding row" is the previous batch's last row, which isn't visible
+    # inside that parse_pages() call, so do the same merge here.
+    merged_boundary_note = None
+    if (existing and new_rows and new_rows[0]["country"] is None
+            and new_rows[0]["sl_no"] == existing[-1]["sl_no"]):
+        first = new_rows.pop(0)
+        last = existing[-1]
+        if first.get("material") and not (last.get("material") or "").endswith(first["material"]):
+            last["material"] = ((last.get("material") or "") + " " + first["material"]).strip()
+        for field in ("declarations", "conditions"):
+            if first.get(field):
+                last[field] = ((last.get(field) or "") + " " + first[field]).strip()
+        if first.get("amendment_ref"):
+            last["amendment_ref"] = " | ".join(a for a in [last.get("amendment_ref"), first["amendment_ref"]] if a)
+        merged_boundary_note = f"Merged cross-batch split-cell continuation from page {first['source_page']} into {last['id']} (sl_no {last['sl_no']})"
+
     all_rows = existing + new_rows
     all_rows = renumber(all_rows, 0)
 
@@ -69,6 +89,8 @@ def main():
             seen_order.append(sl)
 
     print(f"Batch pages {start_page}-{end_page}")
+    if merged_boundary_note:
+        print(merged_boundary_note)
     if carry_forward:
         print(f"Carried forward into this batch: sl_no={carry_forward['sl_no']!r} species={carry_forward['species']!r} material={carry_forward['material']!r}")
     print(f"Rows added this batch: {len(new_rows)}")
