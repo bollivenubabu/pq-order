@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PQ Order 2003 - Schedule IV-VII Search Tool (Unofficial)</title>
+<style>
+  :root {
+    --border: #ccc;
+    --bg: #ffffff;
+    --bg-alt: #f7f7f7;
+    --text: #1a1a1a;
+    --text-muted: #555;
+    --accent: #6b4c1e;
+    --banner-bg: #fff3cd;
+    --banner-border: #e0a800;
+    --link: #0645ad;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+  #disclaimer-banner {
+    background: var(--banner-bg);
+    border-bottom: 3px solid var(--banner-border);
+    padding: 10px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  #disclaimer-banner strong { color: #7a4a00; }
+  header.app-header {
+    padding: 14px 16px 6px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  header.app-header h1 {
+    font-size: 19px;
+    margin: 0 0 2px 0;
+  }
+  header.app-header p.subtitle {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12.5px;
+  }
+  #filters {
+    padding: 12px 16px;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
+  }
+  .filter-group label.group-label {
+    font-weight: bold;
+    font-size: 12.5px;
+    margin-bottom: 2px;
+  }
+  .schedule-checks {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .schedule-checks label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  input[type="text"], select {
+    padding: 5px 7px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 13px;
+    min-width: 200px;
+  }
+  #freetext-group {
+    flex: 1;
+    min-width: 260px;
+  }
+  #freetext-group input { width: 100%; min-width: 100%; }
+  #results-summary {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #clear-filters {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  #clear-filters:hover { background: var(--bg-alt); }
+  table#results-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table#results-table thead th {
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--bg-alt);
+    border-bottom: 2px solid var(--border);
+    font-size: 12.5px;
+    position: sticky;
+    top: 0;
+  }
+  table#results-table tbody tr {
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+  }
+  table#results-table tbody tr:hover {
+    background: #f0f4f8;
+  }
+  table#results-table td {
+    padding: 7px 10px;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  td.col-schedule {
+    font-weight: bold;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  td.col-species { max-width: 260px; }
+  td.col-material { max-width: 220px; }
+  td.col-country { max-width: 180px; }
+  tr.detail-row td {
+    background: #fbfaf7;
+    padding: 14px 20px;
+    border-bottom: 2px solid var(--border);
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 6px 14px;
+    max-width: 900px;
+  }
+  .detail-grid dt {
+    font-weight: bold;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding-top: 2px;
+  }
+  .detail-grid dd {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+  .needs-review-tag {
+    display: inline-block;
+    background: #ffe0e0;
+    border: 1px solid #d9534f;
+    color: #a33;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+  }
+  #print-btn {
+    margin-top: 12px;
+    padding: 6px 14px;
+    font-size: 13px;
+    border: 1px solid var(--accent);
+    background: #fff;
+    color: var(--accent);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  #print-btn:hover { background: var(--accent); color: #fff; }
+  #no-results {
+    padding: 30px 16px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  footer.app-footer {
+    padding: 14px 16px 30px 16px;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  /* Print styles: only the currently expanded detail panel is printed */
+  #print-only { display: none; }
+  @media print {
+    #disclaimer-banner, header.app-header, #filters, #results-summary,
+    table#results-table thead, tr.results-row, footer.app-footer, #print-btn {
+      display: none !important;
+    }
+    tr.detail-row { display: table-row !important; }
+    tr.detail-row td { border: none; padding: 0; }
+    #print-only {
+      display: block !important;
+      padding: 10px;
+    }
+    #print-only .print-disclaimer {
+      border: 1px solid #000;
+      padding: 8px;
+      font-size: 11px;
+      margin-bottom: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="disclaimer-banner">
+  <strong>This is not an official document</strong> — for general reference only. Prepared by Bolli Venu Babu, APPO (Entomology), DPPQ&amp;S, to help fellow colleagues. Please refer to the official PQ Order 2003 document available on the PPQS website (plantquarantineindia.gov.in) for authoritative information. Data extracted from PQ Order 2003 as consolidated in the source PDF — verify against current DPPQ&amp;S gazette notifications for any amendment dated after 3rd February 2026.
+</div>
+
+<header class="app-header">
+  <h1>PQ Order 2003 &mdash; Schedule IV&ndash;VII Search Tool</h1>
+  <p class="subtitle">Unofficial offline reference for plant quarantine inspectors. Search across Prohibited (IV), Restricted (V), Permitted-with-conditions (VI), and PSC-only (VII) schedules.</p>
+</header>
+
+<div id="filters">
+  <div class="filter-group">
+    <label class="group-label">Schedule</label>
+    <div class="schedule-checks">
+      <label><input type="checkbox" class="sched-check" value="IV" checked> IV</label>
+      <label><input type="checkbox" class="sched-check" value="V" checked> V</label>
+      <label><input type="checkbox" class="sched-check" value="VI" checked> VI</label>
+      <label><input type="checkbox" class="sched-check" value="VII" checked> VII</label>
+    </div>
+  </div>
+
+  <div class="filter-group">
+    <label class="group-label" for="species-input">Species / crop</label>
+    <input type="text" id="species-input" list="species-list" placeholder="e.g. Citrus, Mango...">
+    <datalist id="species-list"></datalist>
+  </div>
+
+  <div class="filter-group">
+    <label class="group-label" for="material-select">Material / plant part</label>
+    <select id="material-select">
+      <option value="">All materials</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label class="group-label" for="country-input">Country of origin</label>
+    <input type="text" id="country-input" list="country-list" placeholder="e.g. Bhutan, USA, Any Country...">
+    <datalist id="country-list"></datalist>
+  </div>
+
+  <div class="filter-group" id="freetext-group">
+    <label class="group-label" for="freetext-input">Search declarations / conditions / justification</label>
+    <input type="text" id="freetext-input" placeholder="e.g. fumigation, post-entry quarantine, weed seeds...">
+  </div>
+</div>
+
+<div id="results-summary">
+  <span id="results-count">Loading...</span>
+  <button id="clear-filters">Clear all filters</button>
+</div>
+
+<table id="results-table">
+  <thead>
+    <tr>
+      <th style="width:6%">Sch.</th>
+      <th style="width:8%">Sl.No</th>
+      <th class="col-species" style="width:30%">Species</th>
+      <th class="col-material" style="width:26%">Material</th>
+      <th class="col-country" style="width:20%">Country</th>
+    </tr>
+  </thead>
+  <tbody id="results-body"></tbody>
+</table>
+<div id="no-results" style="display:none;">No matching entries. Try broadening your filters.</div>
+
+<footer class="app-footer">
+  PQ Order Search Tool (unofficial) &mdash; built as a local reference aid. Data extracted from PQ Order 2003 (Schedules IV, V, VI, VII). Not for legal or regulatory citation &mdash; always verify against the official PPQS document and current gazette notifications.
+</footer>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  var data = window.PQ_DATA || [];
+  var resultsBody = document.getElementById('results-body');
+  var resultsCount = document.getElementById('results-count');
+  var noResults = document.getElementById('no-results');
+  var expandedId = null;
+
+  function norm(s) { return (s || '').toString().toLowerCase(); }
+
+  // Strip a trailing amendment/parenthetical for building clean filter option lists,
+  // e.g. "Bhutan (S.O. 3646(E) dt. 14th October, 2020)" -> "Bhutan". Filtering itself
+  // still matches against the full raw value, so amendment-suffixed rows aren't lost.
+  function stripParen(s) {
+    return (s || '').replace(/\s*\([^)]*\)\s*/g, '').replace(/\s*\[[^\]]*\]\s*/g, '').trim();
+  }
+
+  function buildOptions() {
+    var speciesSet = new Set();
+    var materialSet = new Set();
+    var countrySet = new Set();
+    data.forEach(function (r) {
+      if (r.species) speciesSet.add(stripParen(r.species).split(' and ')[0].trim() || r.species);
+      if (r.material) materialSet.add(r.material.replace(/^\([ivxlcdm]+\)\s*/i, '').trim());
+      if (r.country) {
+        var c = stripParen(r.country);
+        if (c) countrySet.add(c);
+      }
+    });
+
+    var speciesList = document.getElementById('species-list');
+    Array.from(speciesSet).sort().forEach(function (s) {
+      var opt = document.createElement('option');
+      opt.value = s;
+      speciesList.appendChild(opt);
+    });
+
+    var materialSelect = document.getElementById('material-select');
+    Array.from(materialSet).sort().forEach(function (m) {
+      var opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      materialSelect.appendChild(opt);
+    });
+
+    var countryList = document.getElementById('country-list');
+    var countryArr = Array.from(countrySet).sort();
+    // Pin "Any Country" variants near the top as their own distinct entries
+    countryArr.sort(function (a, b) {
+      var aAny = /^any\s*country/i.test(a) ? 0 : 1;
+      var bAny = /^any\s*country/i.test(b) ? 0 : 1;
+      if (aAny !== bAny) return aAny - bAny;
+      return a.localeCompare(b);
+    });
+    countryArr.forEach(function (c) {
+      var opt = document.createElement('option');
+      opt.value = c;
+      countryList.appendChild(opt);
+    });
+  }
+
+  function getFilters() {
+    var scheds = Array.from(document.querySelectorAll('.sched-check:checked')).map(function (c) { return c.value; });
+    return {
+      scheds: scheds,
+      species: norm(document.getElementById('species-input').value),
+      material: document.getElementById('material-select').value,
+      country: norm(document.getElementById('country-input').value),
+      freetext: norm(document.getElementById('freetext-input').value)
+    };
+  }
+
+  function matches(r, f) {
+    if (f.scheds.length && f.scheds.indexOf(r.schedule) === -1) return false;
+    if (f.species && norm(r.species).indexOf(f.species) === -1) return false;
+    if (f.material) {
+      var rMat = (r.material || '').replace(/^\([ivxlcdm]+\)\s*/i, '').trim();
+      if (rMat !== f.material) return false;
+    }
+    if (f.country && norm(r.country).indexOf(f.country) === -1) return false;
+    if (f.freetext) {
+      var hay = norm(r.declarations) + ' ' + norm(r.conditions) + ' ' + norm(r.justification);
+      if (hay.indexOf(f.freetext) === -1) return false;
+    }
+    return true;
+  }
+
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function fieldRow(label, value) {
+    if (!value) return '';
+    return '<dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd>';
+  }
+
+  function renderDetailHtml(r) {
+    var html = '<dl class="detail-grid">';
+    html += fieldRow('Species', r.species);
+    html += fieldRow('Material', r.material);
+    html += fieldRow('Country of origin', r.country);
+    html += fieldRow('Declarations', r.declarations);
+    html += fieldRow('Conditions', r.conditions);
+    html += fieldRow('Justification', r.justification);
+    html += fieldRow('Responsible institute', r.responsible_institute);
+    html += fieldRow('Amendment reference', r.amendment_ref);
+    html += fieldRow('Source page (PDF)', r.source_page);
+    html += fieldRow('Sl.No', r.sl_no);
+    html += fieldRow('Schedule', 'Schedule ' + r.schedule);
+    html += '</dl>';
+    html += '<button id="print-btn" data-id="' + esc(r.id) + '">Print this result</button>';
+    return html;
+  }
+
+  function render() {
+    var f = getFilters();
+    var filtered = data.filter(function (r) { return matches(r, f); });
+    resultsCount.textContent = filtered.length + ' of ' + data.length + ' entries shown';
+    resultsBody.innerHTML = '';
+    noResults.style.display = filtered.length ? 'none' : 'block';
+
+    var MAX_RENDER = 800;
+    var toRender = filtered.slice(0, MAX_RENDER);
+
+    toRender.forEach(function (r) {
+      var tr = document.createElement('tr');
+      tr.className = 'results-row';
+      tr.dataset.id = r.id;
+      var reviewTag = r.needs_review ? '<span class="needs-review-tag">check source</span>' : '';
+      tr.innerHTML =
+        '<td class="col-schedule">' + esc(r.schedule) + '</td>' +
+        '<td>' + esc(r.sl_no) + '</td>' +
+        '<td class="col-species">' + esc(r.species) + reviewTag + '</td>' +
+        '<td class="col-material">' + esc(r.material) + '</td>' +
+        '<td class="col-country">' + esc(r.country) + '</td>';
+      tr.addEventListener('click', function () { toggleDetail(r); });
+      resultsBody.appendChild(tr);
+    });
+
+    if (filtered.length > MAX_RENDER) {
+      var infoTr = document.createElement('tr');
+      infoTr.innerHTML = '<td colspan="5" style="text-align:center;color:#888;padding:10px;">Showing first ' + MAX_RENDER + ' of ' + filtered.length + ' matches &mdash; narrow your filters to see more specific results.</td>';
+      resultsBody.appendChild(infoTr);
+    }
+  }
+
+  function toggleDetail(r) {
+    var existingDetail = resultsBody.querySelector('tr.detail-row');
+    if (existingDetail) existingDetail.remove();
+    if (expandedId === r.id) {
+      expandedId = null;
+      return;
+    }
+    expandedId = r.id;
+    var rowEl = resultsBody.querySelector('tr[data-id="' + CSS.escape(r.id) + '"]');
+    var detailTr = document.createElement('tr');
+    detailTr.className = 'detail-row';
+    var td = document.createElement('td');
+    td.colSpan = 5;
+    td.innerHTML = renderDetailHtml(r);
+    detailTr.appendChild(td);
+    if (rowEl && rowEl.nextSibling) {
+      resultsBody.insertBefore(detailTr, rowEl.nextSibling);
+    } else {
+      resultsBody.appendChild(detailTr);
+    }
+    detailTr.querySelector('#print-btn').addEventListener('click', function () {
+      printResult(r);
+    });
+  }
+
+  function printResult(r) {
+    var existing = document.getElementById('print-only');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.id = 'print-only';
+    div.innerHTML =
+      '<div class="print-disclaimer">Unofficial reference &mdash; verify against PPQS official document (plantquarantineindia.gov.in) and current DPPQ&amp;S gazette notifications. Not for legal citation.</div>' +
+      '<h2>Schedule ' + esc(r.schedule) + ' &mdash; Sl.No ' + esc(r.sl_no) + '</h2>' +
+      renderDetailHtml(r).replace(/<button[^>]*>.*?<\/button>/, '');
+    document.body.appendChild(div);
+    window.print();
+    setTimeout(function () { div.remove(); }, 500);
+  }
+
+  document.querySelectorAll('.sched-check').forEach(function (el) { el.addEventListener('change', render); });
+  document.getElementById('species-input').addEventListener('input', render);
+  document.getElementById('material-select').addEventListener('change', render);
+  document.getElementById('country-input').addEventListener('input', render);
+  document.getElementById('freetext-input').addEventListener('input', render);
+  document.getElementById('clear-filters').addEventListener('click', function () {
+    document.querySelectorAll('.sched-check').forEach(function (c) { c.checked = true; });
+    document.getElementById('species-input').value = '';
+    document.getElementById('material-select').value = '';
+    document.getElementById('country-input').value = '';
+    document.getElementById('freetext-input').value = '';
+    render();
+  });
+
+  buildOptions();
+  render();
+})();
+</script>
+
+</body>
+</html>
