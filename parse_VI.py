@@ -5,7 +5,10 @@ import json
 
 PDF_PATH = r"C:\Users\bolli\Downloads\PQ Order 2003.pdf"
 
-ROMAN_MARKER_RE = re.compile(r"^\(([ivxlcdm]+)\)\s*", re.IGNORECASE)
+# The leading "(" is occasionally missing from an enumeration marker due to a font/extraction
+# quirk in the source PDF (confirmed: species 458's country cell reads "i) Netherlands\nii) USA..."
+# with no opening parens at all) -- make it optional rather than required.
+ROMAN_MARKER_RE = re.compile(r"^\(?([ivxlcdm]+)\)\s*", re.IGNORECASE)
 SLNO_RE = re.compile(r"^(\d+)\.?$")
 
 HEADER_ROW_MARKERS = {"Sl. No.", "Sl.No.", "Sl. No"}
@@ -161,11 +164,20 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                         if country_entry:
                             country_entry = country_entry.rstrip(",;").strip() or None
                         # pdfplumber sometimes splits an unusually tall cell (long declarations/
-                        # conditions text) into an extra table row with no country/sl_no of its
-                        # own -- that's a continuation of the immediately preceding row, not a
-                        # new entry, so fold its text back in rather than emit a bare-country row.
-                        if country_entry is None and sl_no_clean == "" and not material_clean and rows:
+                        # conditions/country text, e.g. a country name with a long embedded
+                        # amendment reference) into an extra table row with no sl_no/material of
+                        # its own -- that's a continuation of the immediately preceding row, not a
+                        # new entry. A continuation fragment either has no country at all, or a
+                        # country-cell remnant that starts lowercase (mid-sentence/mid-parenthetical,
+                        # e.g. "dated 29th August, 2019)" finishing "Chile (S.O. 3141 (E)" from the
+                        # row above) rather than a genuine new country name.
+                        is_continuation_fragment = country_entry is None or (
+                            country_entry and country_entry[0].islower()
+                        )
+                        if is_continuation_fragment and sl_no_clean == "" and not material_clean and rows:
                             prev = rows[-1]
+                            if country_entry:
+                                prev["country"] = ((prev["country"] or "") + " " + country_entry).strip()
                             for field, val in (("declarations", decl_final), ("conditions", cond_final)):
                                 if val:
                                     prev[field] = ((prev[field] or "") + " " + val).strip()
