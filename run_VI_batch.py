@@ -19,6 +19,8 @@ def flag_needs_review(rows):
         reasons = []
         if r["sl_no"] is None:
             reasons.append("no_sl_no")
+        if r.get("country") is None:
+            reasons.append("no_country_in_source")
         country = r.get("country") or ""
         markers = MULTI_ROMAN_RE.findall(country)
         if len(markers) > 1:

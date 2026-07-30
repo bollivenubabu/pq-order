@@ -81,6 +81,33 @@ PAGE_ROW_OVERRIDES = {
          "Free from:-\n(i) Grapholita packardi ( Cherry fruitworm)\n(ii) Rhagoletis mendax ( Blueberry fruit fly)\n(iii) Spodoptera frugiperda (Fall armyworm)\n(iv) Diaporthe vaccinii (Phomopsis twig blight of\nblueberry)\n(v) Peach rosettemosaic virus (rosette mosaic of\npeach)\n(vi) Tomato ringspot virus (ringspot of tomato)",
          "Pest free status for Rhagoletis\nmendax (Blueberry fruit fly) as\nper international standards Or\n(a) Methyl bromide fumigation\n@ 32 g/m3 for 2 hrs at 210C\nor above at NAP or\nequivalent thereof against\nBlueberry fruit fly. Or\n(b) Pre-shipment cold treatment\nat 00C or below for 10 days;\n0.550C or below for 11 days;\n1.10C or below for 12 days\nplus in-transit refrigeration"],
     ],
+    284: [
+        ["616.", "Solanum melongena\n(Brinjal/ Eggplant/\nAubergine)", "(i) Seeds for sowing",
+         "(i) China", "Free from Pythium spinosum (root rot)",
+         "(i) Free from soil contamination.\n(ii)Free from quarantine weed\nseeds."],
+        [None, None, None, "(ii) Europe",
+         "Free from:\n(a) Pepino mosaic virus\n(b) Tomato bushy stunt virus (Lycopersicon virus 4)\n(c) Tomato black ring nephovirus",
+         "(i) Free from quarantine weed\nseeds.\n(ii) Crop inspection and\ncertification for free from\nPepino mosaic virus, Tomato\nbushy stunt virus\n(Lycopersicon virus 4) and\nTomato black ring nephovirus"],
+        [None, None, None, "(iii) Japan\n(iv) Vietnam\n(v) Philippines\n(vi)Thailand",
+         "Nil", "Free from quarantine weed seeds."],
+        [None, None, None, "(vii) USA",
+         "Free from Tomato bushy stunt virus (Lycopersicon\nvirus 4)",
+         "(i) Free from quarantine weed\nseeds.\n(ii) Crop inspection and\ncertification for free from\ntomato bushy stunt virus."],
+        [None, None, None, "(viii) Jordan\n(ix) Israel",
+         "Free from:\n(a) Peronospora hyoscyami f. sp. tabacina (angular\ntobacco leaf spot)\n(b) Eggplant mottled dwarf virus (hibiscus vein\nyellowing virus)",
+         "(i) Free from quarantine weeds\nseeds.\n(ii) Crop inspection and\ncertification for free from eggplant\nmottled dwarf virus."],
+        [None, None, None, "(x) Russia\n(xi)Taiwan",
+         "Free from:\n(a) Peronospora hyoscyami f.sp. tabacina\n(b) Pepino mosaic virus\n(c) Tomato bushy stunt virus",
+         "(i) Freedom from quarantine\nweed seeds\n(ii) Post-entry quarantine\ngrowing for 2-3 months\n(iii) Crop inspection and\ncertification for freedom from\nPepino mosaic virus\nandTomato bushy stunt virus"],
+        [None, None, "(ii) Vegetables for\nconsumption", "Thailand",
+         "Free from:\n(a) Bactrocera papayae (papaya fruit fly)\n(b) Pseudococcus jackbeardsleyi (Jack Beardsley\nmealybug)\n(c) Tetranychus marianae\n(d) Tetranychus truncatus",
+         "Pest-free area status for papaya\nfruit fly (Bactrocera papayae ) as\nper international standards."],
+        ["617.", "Solanum muricatum\n(Pepino)", "(i) Seeds for sowing",
+         "(i) Italy\n(ii) Spain\n(iii) USA", "Nil", "Free from quarantine weed seeds."],
+        [None, None, "(ii) Cuttings", None, None,
+         "(i) Free from soil.\n(ii) Post-entry quarantine for one\ngrowth season except for\nresearch"],
+        [None, None, "(iii) Plants/", "(iv) Israel", "Nil", "(i) Free from soil."],
+    ],
 }
 
 
@@ -249,15 +276,20 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                         # country-cell remnant that starts lowercase (mid-sentence/mid-parenthetical,
                         # e.g. "dated 29th August, 2019)" finishing "Chile (S.O. 3141 (E)" from the
                         # row above) rather than a genuine new country name.
-                        # A row with country=None is always this kind of split artifact regardless
-                        # of material (confirmed: every occurrence found -- e.g. species 613's
-                        # Raspberry material "(i) Cuttings Rooted/un-" / "rooted)/ Bud wood..." is
-                        # one material description split mid-word across two table rows). A
-                        # lowercase-starting country fragment is the same phenomenon but only when
-                        # material is also blank, since a genuinely new material row always pairs
-                        # with a genuinely new (capitalized) country.
-                        is_continuation_fragment = country_entry is None or (
-                            not material_clean and country_entry and country_entry[0].islower()
+                        # A row with country=None is usually this kind of split artifact (confirmed:
+                        # e.g. species 613's Raspberry material "(i) Cuttings Rooted/un-" / "rooted)/
+                        # Bud wood..." is one material description split mid-word across two table
+                        # rows) -- UNLESS the material text itself starts with its own roman-numeral
+                        # marker, which means it's a genuinely new, complete material entry that
+                        # simply has no country listed in the source (e.g. species 617's "(ii)
+                        # Cuttings"), not a wrapped fragment of the previous material. A
+                        # lowercase-starting country fragment is the same continuation phenomenon
+                        # but only when material is also blank, since a genuinely new material row
+                        # always pairs with a genuinely new (capitalized) country.
+                        material_is_fresh_entry = bool(material_clean) and bool(ROMAN_MARKER_RE.match(material_clean))
+                        is_continuation_fragment = (
+                            (country_entry is None and not material_is_fresh_entry)
+                            or (not material_clean and country_entry and country_entry[0].islower())
                         )
                         if is_continuation_fragment and sl_no_clean == "" and rows:
                             prev = rows[-1]
