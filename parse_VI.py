@@ -108,6 +108,54 @@ PAGE_ROW_OVERRIDES = {
          "(i) Free from soil.\n(ii) Post-entry quarantine for one\ngrowth season except for\nresearch"],
         [None, None, "(iii) Plants/", "(iv) Israel", "Nil", "(i) Free from soil."],
     ],
+    299: [
+        # Rows for 646-650 already extract correctly via the normal pipeline; only the final
+        # row (651, Tilia americana) has its Sl.No/species cells silently dropped by
+        # pdfplumber's grid detection (a different failure mode from the extra-column pages:
+        # here the row length is a normal 6, but the leading two cells are genuinely lost, not
+        # shifted -- confirmed by direct inspection of table.extract()'s raw output for this
+        # page). Transcribing the whole page for consistency, copying the already-correct rows
+        # verbatim and fixing only the last one.
+        ["646.", "Thuja plicata", "Timber logs with/\nwithout bark for\nconsumption", "Canada",
+         "Free from:\n(a) Lambdina fiscellaria (eastern hemlock looper)\n(b) Trypodendron lineatum (striped ambrosia\nbeetle)\n(c) Heterobasidion annosum\n(d) Heterobasidion parviporum\n(e) Seiridium cardinal (cypress canker)",
+         "Fumigation with Methyl bromide @\n48 g/m3 for 24 hrs. at 210C and above\nor equivalent thereof or heat\ntreatment at 560C (core temperature)\nfor 30 minutes or any other treatment\napproved by the Plant Protection\nAdviser to the Government of India\nThe treatment should be endorsed on\nPhytosanitary Certificate issued at\nthe Country of Origin/re-export."],
+        ["647.", "Thungbergia spp.", "Seeds for sowing",
+         "(i) Germany\n(ii) Netherlands\n(iii) France\n(iv) UK\n(v) Russia\n(vi) USA",
+         "Nil", "Free from quarantine weed seeds."],
+        ["648.", "Thymus vulgaris\n(Thyme)", "(i) Seeds for sowing", "(i) Denmark",
+         "Nil", "Free from quarantine weed seeds."],
+        [None, None, None,
+         "(i) UK\n(ii) USA\n(iii) The Netherlands\n(v) Spain\n(vi) Italy\n(vii) France\n(viii) Germany",
+         "Nil",
+         "(i) Freedom from quarantine weeds\nseeds\n(ii) Crop inspection and\ncertification for freedom from\nHelix aspersa (Common snail)"],
+        [None, None, "(ii) Tissue culture\nplants", "Canada",
+         "Certified that the tissue culture plants were obtained\nfrom mother stock tested and maintained free from\nany virus.",
+         "Nil"],
+        ["649.", "Thysanolaena latifolia\n(Broom grass)", "(i) Broom sticks\nfor consumption",
+         "(i) Myanmar\n(ii) Nepal", "Nil", "Free from soil and other plant\ndebris."],
+        ["650.", "Thysostachys spp.", "Seeds for sowing", "(i) Thailand",
+         "Free from:\n(a) Aspergillus wentii\n(b) Rhizopus sp.", "Free from quarantine weed seeds."],
+        [None, None, None, "(ii) China", "Nil", "Free from quarantine weed seeds."],
+        ["651.", "Tilia americana\n(Bass wood)", "(i) Wood with bark", "USA",
+         "Free from :\n(a) Chaetocnema confinis (flea beetle)\n(b) Malacosoma americanum (eastern tent\ncaterpillar)\n(c) Malacosoma disstria (forest tent caterpillar)\n(d) Operophtera brumata (winter moth)\n(e) Orgyia leucostigma (white-marked tussock\nmoth)\n(f) Papilio Canadensis (tiger swallowtail)",
+         "Fumigation with Methyl bromide at\n48 g/m3 for 24 hrs at 210C and above\nor equivalent thereof or any other\ntreatment approved by Plant\nProtection Adviser to the\nGovernment of India.\nThe treatment should be endorsed on\nPhytosanitary Certificate issued at\nthe country of origin/re-export."],
+    ],
+    300: [
+        [None, None, "(ii) Wood without\nbark", "USA",
+         "Free from :\n(a) Chaetocnema confinis (flea beetle)\n(b) Malacosoma americanum (eastern tent\ncaterpillar)\n(c) Operophtera brumata (winter moth)\n(d) Papilio Canadensis (tiger swallowtail)",
+         "Fumigation with Methyl bromide at\n48 g/m3 for 24 hrs at 210C and above\nor equivalent thereof or heat\ntreatment at 56 0C (core temperature)\nor 30 minutes or any other treatment\napproved by Plant Protection\nAdviser to the Government of India.\nThe treatment should be endorsed on\nPhytosanitary Certificate issued at\nthe country of origin/re-export."],
+        ["652.", "Tillandsia spp (All related\nspp.) (Air born plants)", "Plants for\npropagation",
+         "USA",
+         "Free from:-\n(a) Nipaecoccus nipae (spiked mealybug)\n(b) Unaspis citri (citrus snow scale)",
+         "(i) Post entry quarantine for a\ngrowing period of 60 days\n(ii) Free from soil"],
+        ["653.", "Timber logs", None, None, None, None],
+        [None, "(i) Castanea spp.\n(Chest nut)", "Logs with/without\nbark", "Any Country",
+         "Free from Chest nut blight\n(Cryphonectriaparasitica)-American strain",
+         "The timber shall be fumigated with\nMethyl bromide shall be @ 48 g/m3\nfor 24 hrs at 210C and above or\nequivalent thereof under NAP or\nkiln drying as the case may be at the\ncountry of origin and treatment shall\nbe endorsed on Phytosanitary\nCertificate or by any other\nfumigant/substance in the manner\napproved by the Plant Protection\nAdviser for this purpose."],
+        [None, "(ii) Ulmus spp (Elm)", "Logs with/without\nbark", "Any Country",
+         "Free from:\n(a) Dutch elm disease (Ceratocystis ulmi)-\nAmerican and European strains\n(b) Elm bark beetle (Scolytus scolytus)",
+         "The timber shall be fumigated\nwith Methyl bromide shall be @ 48\ng/m3 for 24 hrs at 210C and above\nor equivalent thereof under NAP\nor kiln drying as the case may be at\nthe country of origin and treatment\nshall be endorsed on Phytosanitary\nCertificate or by any other\nfumigant/substance in the manner\napproved by the Plant Protection\nAdviser for this purpose."],
+    ],
 }
 
 
