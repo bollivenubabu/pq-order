@@ -74,13 +74,19 @@ def extract_amendment(text):
     return text, None
 
 
-def parse_pages(start_page, end_page, idx_start=0):
+def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
+    """carry_forward: optional {'sl_no', 'species', 'material'} from the previous
+    batch's last row, so a species/material that continues across a batch
+    boundary (the table itself only shows it once, then leaves the cell blank
+    for however many rows follow) is correctly attributed instead of coming
+    out as an orphan row with no sl_no/species."""
     rows = []
     idx_holder = [idx_start]
 
-    cur_sl_no = None
-    cur_species = None
-    cur_material = None
+    carry_forward = carry_forward or {}
+    cur_sl_no = carry_forward.get("sl_no")
+    cur_species = carry_forward.get("species")
+    cur_material = carry_forward.get("material")
 
     with pdfplumber.open(PDF_PATH) as pdf:
         for page_num in range(start_page, end_page + 1):

@@ -42,22 +42,17 @@ def main():
         with open(OUT_FILE, encoding="utf-8") as f:
             existing = json.load(f)
 
-    new_rows = parse_pages(start_page, end_page, idx_start=0)
-    flag_needs_review(new_rows)
-
-    merged_note = None
-    if existing and new_rows and new_rows[0]["sl_no"] is None:
-        first = new_rows.pop(0)
+    carry_forward = None
+    if existing:
         last = existing[-1]
-        for field in ("species", "material", "country", "declarations", "conditions"):
-            if first.get(field):
-                last_val = last.get(field) or ""
-                last[field] = (last_val + " " + first[field]).strip()
-        # carry over review reasons from the merged fragment
-        if first.get("needs_review"):
-            last["needs_review"] = True
-            last["_review_reasons"] = list(set((last.get("_review_reasons") or []) + (first.get("_review_reasons") or [])))
-        merged_note = f"Merged cross-page continuation from page {first['source_page']} into previous row {last['id']} (sl_no {last['sl_no']})"
+        carry_forward = {
+            "sl_no": last.get("sl_no"),
+            "species": last.get("species"),
+            "material": last.get("material"),
+        }
+
+    new_rows = parse_pages(start_page, end_page, idx_start=0, carry_forward=carry_forward)
+    flag_needs_review(new_rows)
 
     all_rows = existing + new_rows
     all_rows = renumber(all_rows, 0)
@@ -66,7 +61,7 @@ def main():
         json.dump(all_rows, f, ensure_ascii=False, indent=2)
 
     # Report
-    batch_rows = all_rows[len(existing):] if not merged_note else all_rows[len(existing) - 1:]
+    batch_rows = all_rows[len(existing):]
     sl_nos_in_batch = [r["sl_no"] for r in batch_rows if r["sl_no"] is not None]
     seen_order = []
     for sl in sl_nos_in_batch:
@@ -74,8 +69,8 @@ def main():
             seen_order.append(sl)
 
     print(f"Batch pages {start_page}-{end_page}")
-    if merged_note:
-        print(merged_note)
+    if carry_forward:
+        print(f"Carried forward into this batch: sl_no={carry_forward['sl_no']!r} species={carry_forward['species']!r} material={carry_forward['material']!r}")
     print(f"Rows added this batch: {len(new_rows)}")
     print(f"Total rows so far: {len(all_rows)}")
     print(f"Distinct Sl.No sequence in this batch: {seen_order[0] if seen_order else None} ... {seen_order[-1] if seen_order else None} ({len(seen_order)} distinct species)")
