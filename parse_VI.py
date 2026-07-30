@@ -141,6 +141,12 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                     has_country_content = any(c for c in country_entries_raw)
                     if not any([has_country_content, decl_clean, cond_clean, material_clean, species_clean]):
                         continue
+                    # A row with a species/material label but no country, declarations, or
+                    # conditions at all is a pure category-header artifact (e.g. "Flower bulbs:"
+                    # introducing a group of lettered sub-species that carry the real data on the
+                    # rows below) -- not a data row, so skip emitting it.
+                    if not has_country_content and not decl_clean and not cond_clean:
+                        continue
 
                     species_final, species_amend = cur_species, species_clean_amend
                     material_final, material_amend = cur_material, material_clean_amend
