@@ -135,6 +135,20 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
 
                     for country_entry_raw in country_entries_raw:
                         country_entry = clean(country_entry_raw) or None
+                        # pdfplumber sometimes splits an unusually tall cell (long declarations/
+                        # conditions text) into an extra table row with no country/sl_no of its
+                        # own -- that's a continuation of the immediately preceding row, not a
+                        # new entry, so fold its text back in rather than emit a bare-country row.
+                        if country_entry is None and sl_no_clean == "" and not material_clean and rows:
+                            prev = rows[-1]
+                            for field, val in (("declarations", decl_final), ("conditions", cond_final)):
+                                if val:
+                                    prev[field] = ((prev[field] or "") + " " + val).strip()
+                            if amendment_ref:
+                                prev["amendment_ref"] = " | ".join(
+                                    a for a in [prev["amendment_ref"], amendment_ref] if a
+                                )
+                            continue
                         idx_holder[0] += 1
                         rows.append({
                             "id": f"S6-{idx_holder[0]:04d}",
