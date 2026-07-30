@@ -1,0 +1,36 @@
+PQ Form 24
+Technical Information Requirement for Pest Risk Analysis (PRA)
+1. Plant and Plant Product
+1.1 Common name;
+1.2 Scientific (genus & species/strain/variety/cultivar) name;
+1.3 Resistant or non-resistant varieties;
+1.4 Countries that have already imported;
+1.5 Plant part to be imported (whole plant/seed/cutting/sapling/ budwood/bulb/fruit etc.);
+2. Production Area
+2.1 Place of production on map (country and province);
+2.2 Production and Export (tons/year);
+3. Cultivation practices
+3.1 Harvest method and time;
+3.2 Plant protection measures (to control and eradicate the pests);
+4. Pest List (separately for all the pests)
+4.1 Scientific & Common name;
+4.2 Pest biology;
+4.3 Plant parts affected;
+4.4 Symptoms;
+4.5 Distribution and pest free areas;
+4.6 Pest status (prevalence);
+4.7 Management practices;
+4.7.1 Cultural practices;
+4.7.2 Biological (use of biological control agents, resistant varieties, crop skipping…);
+4.7.3 Chemical (type, method, time and number of pesticide use…)
+4.8 Database and reference
+5. Packaging
+5.1 Method of packaging;
+5.2 Inspection procedure;
+5.3 Post harvest treatment;
+5.4 Conditions and security of storage place.
+6. Export program (policy/activity)
+6.1 Trading partners;
+6.2 Existing procedure for issuing phytosanitary certificates (including additional declaration).
+7. Copies of relevant supporting documents.
+37

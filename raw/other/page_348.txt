@@ -1,0 +1,35 @@
+SCHEDULE-XII
+[See clause 3 (4)]
+Quantities of seeds permitted for trial purpose/accession to gene bank of
+National Bureau of Plant Genetic Resources.
+Crop Multi-location Agronomic MLT+ Accession
+Species Trials Trials AT (Kg) To gene
+(MLT)(Kg) (AT)(Kg) bank
+(Gm)
+1. Black gram 6.0 14.0 20.0 200/2500
+2. Castor 6.0 9.0 15.0 900/4500
+3. Chick pea 30.0 70.0 100.0 800/2500
+4. Cowpea 10.0 20.0 30.0 300/2500
+5. Green gram 6.0 14.0 20.0 500/2500
+6. Groundnut (Pod) 50.0 100.00 150.00 900/2500
+7. Lentil 10.0 20.0 30.0 70/2500
+8. Linseed 10.0 15.0 25.0 15/2500
+9. Maize 10.0 10.0 20.0 700/4500
+10. Minor millet 4.0 6.0 10.0 15/4500
+11. Niger 4.0 4.0 8.0 10/4500
+12. Paddy ----- ----- 16.0 50/2500
+13. Pearl millet 2.0 3.0 5.0 15/4500
+14. Peas 30.0 70.0 100.0 600/2500
+15. Pigeon pea 6.0 14.0 20.0 400/2500
+16. Rajmah 20.0 30.0 50.0 500/2500
+17. Rape/ Mustard 2.0 3.0 5.0 6/2500
+18. Safflower 4.0 6.0 10.0 100/4500
+19. Sesamum 2.0 3.0 5.0 6/2500
+20. Sunflower 4.0 6.0 10.0 100/4500
+21. Sorghum 4.0 6.0 10.0 35/4500
+22. Soybean 20.0 55.0 75.0 400/2500
+23. Wheat ----- ----- 5.0 150/2500
+*The seed size varies considerably from variety to variety of crop. Hence, number of seeds per
+variety as per the gene bank standards for self/cross pollinated is also given for each crop. Seeds
+should not be treated with any chemical.
+340

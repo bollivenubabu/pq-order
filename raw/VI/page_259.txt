@@ -1,0 +1,38 @@
+(ss) Heterobasidion annosum
+(tt) Nectria radicicola (black root)
+(uu) Phymatotrichopsis omnivora
+(vv) Phytophthora citricola
+(ww) Phytophthora cryptogea
+(xx) Peach rosette phytoplasma
+(yy) Peach yellows phytoplasma
+(zz) Rhizobium rhizogenes
+(aaa) American plum line pattern virus
+(bbb)Cherry green ring mottle virus
+(ccc)Cherry rasp leaf virus
+(ddd) Cherry rusty mottle virus
+(eee)Peach rosette mosaic virus
+(fff) Prune dwarf virus
+(ggg) Strawberry latent ringspot virus
+(hhh) Tomato ringspot virus
+555. Pseudotsuga menziesii (i) Wood with/ (i) China Free from: Fumigation with Methyl
+(Douglas fir) withoutbark (a) Dendroctonus pseudotsugae (Dougles fir bromide at 48 g/m3 for 24 hrs. at
+beetle) 210C and above or equivalent
+(b) Bursaphenchus xylophilus (Pine wood thereof or heat treatment at 560C
+Nematode) (core temperature) for 30 minutes
+(c) Hylobius abietis (Large pine weevil) or any other treatment approved
+(d) Hylastes ater (Black pine bark beetle) by Plant Protection Adviser.
+(e) Phellinus weirii (Laminated root rot)
+(f) Phytophthora cryptogea (Tomato foot rot) The treatment should be
+(g) Sirex juvencus (Steel-blue wood wasp) endorsed on Phytosanitary
+(h) Trypodendron lineatum (Striped ambrosia Certificate issued at the country
+beetle) of origin/re-export.
+(i) Amylostereum areolatum (Sirex wasp fungus)
+(j) Botryosphaeria laricina (Shoot blight of
+larch)
+(k) Hylotrupes bajulus (House longhorn beetle)
+(l) Ips typographus (Eight-toothed bark beetle)
+(m) Lymantria monacha (Nun moth)
+(n) Orthotomicus erosus (Mediterranean pine
+beetle)
+(o) Rhizobium rhizogenes (Gall)
+259
