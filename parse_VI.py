@@ -111,22 +111,29 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                     decl_clean = clean(decl_cell)
                     cond_clean = clean(cond_cell)
 
+                    # A material/species cell can contain ONLY an amendment reference (the source
+                    # relies on the reader inferring the material is unchanged from the row above,
+                    # e.g. a cell reading just "(vide S.O. 3246(E) dated 20.07.2023)"). Extract the
+                    # amendment first so the carried-forward value isn't overwritten with nothing.
+                    species_clean_final, species_clean_amend = (extract_amendment(species_clean) if species_clean else (None, None))
+                    material_clean_final, material_clean_amend = (extract_amendment(material_clean) if material_clean else (None, None))
+
                     if sl_no_clean and SLNO_RE.match(sl_no_clean):
                         cur_sl_no = sl_no_clean.rstrip(".")
-                        cur_species = species_clean or cur_species
-                        cur_material = material_clean or cur_material
+                        cur_species = species_clean_final or cur_species
+                        cur_material = material_clean_final or cur_material
                     else:
-                        if species_clean:
-                            cur_species = species_clean
-                        if material_clean:
-                            cur_material = material_clean
+                        if species_clean_final:
+                            cur_species = species_clean_final
+                        if material_clean_final:
+                            cur_material = material_clean_final
 
                     has_country_content = any(c for c in country_entries_raw)
                     if not any([has_country_content, decl_clean, cond_clean, material_clean, species_clean]):
                         continue
 
-                    species_final, species_amend = extract_amendment(cur_species)
-                    material_final, material_amend = extract_amendment(cur_material)
+                    species_final, species_amend = cur_species, species_clean_amend
+                    material_final, material_amend = cur_material, material_clean_amend
                     decl_final, decl_amend = extract_amendment(decl_clean or None)
                     cond_final, cond_amend = extract_amendment(cond_clean or None)
                     amendment_ref = " | ".join(
@@ -135,6 +142,8 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
 
                     for country_entry_raw in country_entries_raw:
                         country_entry = clean(country_entry_raw) or None
+                        if country_entry:
+                            country_entry = country_entry.rstrip(",;").strip() or None
                         # pdfplumber sometimes splits an unusually tall cell (long declarations/
                         # conditions text) into an extra table row with no country/sl_no of its
                         # own -- that's a continuation of the immediately preceding row, not a
