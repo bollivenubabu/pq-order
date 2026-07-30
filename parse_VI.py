@@ -9,6 +9,11 @@ PDF_PATH = r"C:\Users\bolli\Downloads\PQ Order 2003.pdf"
 # quirk in the source PDF (confirmed: species 458's country cell reads "i) Netherlands\nii) USA..."
 # with no opening parens at all) -- make it optional rather than required.
 ROMAN_MARKER_RE = re.compile(r"^\(?([ivxlcdm]+)\)\s*", re.IGNORECASE)
+# Country lists are usually roman-numeral-enumerated ((i),(ii)...), but a few entries use
+# single-letter markers instead (confirmed: species 704, Vigna subterranea, country cell reads
+# "a) Nigeria\nb) Ghana..."). Safe to also split on this in the country column specifically --
+# letter markers used for declaration/pest sub-lists live in a different column already.
+LETTER_MARKER_RE = re.compile(r"^\(?([a-z])\)\s*", re.IGNORECASE)
 SLNO_RE = re.compile(r"^(\d+)\.?$")
 
 HEADER_ROW_MARKERS = {"Sl. No.", "Sl.No.", "Sl. No"}
@@ -209,10 +214,13 @@ def split_countries(country_cell):
     entries = []
     current = None
     for line in lines:
-        if ROMAN_MARKER_RE.match(line):
+        marker_re = ROMAN_MARKER_RE if ROMAN_MARKER_RE.match(line) else (
+            LETTER_MARKER_RE if LETTER_MARKER_RE.match(line) else None
+        )
+        if marker_re:
             if current is not None:
                 entries.append(current)
-            current = ROMAN_MARKER_RE.sub("", line, count=1)
+            current = marker_re.sub("", line, count=1)
         else:
             if current is None:
                 current = line
@@ -321,9 +329,10 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                         # amendment reference) into an extra table row with no sl_no/material of
                         # its own -- that's a continuation of the immediately preceding row, not a
                         # new entry. A continuation fragment either has no country at all, or a
-                        # country-cell remnant that starts lowercase (mid-sentence/mid-parenthetical,
-                        # e.g. "dated 29th August, 2019)" finishing "Chile (S.O. 3141 (E)" from the
-                        # row above) rather than a genuine new country name.
+                        # country-cell remnant that starts lowercase or with a digit (mid-sentence/
+                        # mid-parenthetical/mid-date, e.g. "dated 29th August, 2019)" finishing
+                        # "Chile (S.O. 3141 (E)", or "14thOctober, 2020)" finishing "Bhutan (S.O.
+                        # 3646(E) dt." for species 690) rather than a genuine new country name.
                         # A row with country=None is usually this kind of split artifact (confirmed:
                         # e.g. species 613's Raspberry material "(i) Cuttings Rooted/un-" / "rooted)/
                         # Bud wood..." is one material description split mid-word across two table
@@ -337,7 +346,7 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                         material_is_fresh_entry = bool(material_clean) and bool(ROMAN_MARKER_RE.match(material_clean))
                         is_continuation_fragment = (
                             (country_entry is None and not material_is_fresh_entry)
-                            or (not material_clean and country_entry and country_entry[0].islower())
+                            or (not material_clean and country_entry and (country_entry[0].islower() or country_entry[0].isdigit()))
                         )
                         if is_continuation_fragment and sl_no_clean == "" and rows:
                             prev = rows[-1]
