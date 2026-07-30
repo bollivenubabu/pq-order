@@ -11,6 +11,14 @@ SLNO_RE = re.compile(r"^(\d+)\.?$")
 HEADER_ROW_MARKERS = {"Sl. No.", "Sl.No.", "Sl. No"}
 COLUMN_NUM_MARKER_ROW = {"(1)", "(2)", "(3)", "(4)", "(5)", "(6)"}
 
+# A handful of Sl.No cells render as garbled glyphs due to a font-encoding quirk in the source
+# PDF rather than any ambiguity in the underlying document (confirmed by context: sequential
+# numbering and the entry's position make the intended number unambiguous). Keyed by
+# (page_num, garbled_text) so each fix is tied to the exact spot it was found and verified.
+SLNO_GLYPH_FIXES = {
+    (139, "py."): "262.",
+}
+
 
 def is_header_row(row):
     """Only the two literal header rows (column titles, and the (1)-(6) markers)
@@ -105,6 +113,8 @@ def parse_pages(start_page, end_page, idx_start=0, carry_forward=None):
                     sl_no_cell, species_cell, material_cell, country_cell, decl_cell, cond_cell = raw_row
 
                     sl_no_clean = clean(sl_no_cell)
+                    if (page_num, sl_no_clean) in SLNO_GLYPH_FIXES:
+                        sl_no_clean = SLNO_GLYPH_FIXES[(page_num, sl_no_clean)]
                     species_clean = clean(species_cell)
                     material_clean = clean(material_cell)
                     country_entries_raw = split_countries(country_cell or "")
